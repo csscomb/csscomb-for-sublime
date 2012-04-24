@@ -6,7 +6,7 @@ Tool for sorting CSS properties in specific order.
 
 * Sorting CSS properties. The order of properties in the help of professionals
 * Setting the order of CSS properties. Use the order to which you are accustomed to
-* Parsing CSS in the tags <style>, style="..." attribute. CSScomb find a CSS-code to other languages ​​and will sort it
+* Parsing CSS in the tags <style>, style="..." attribute. CSScomb find a CSS-code to other languages and will sort it
 * Formatting style sheets does not change. Work as a singleline and multiline CSS
 * Separation of CSS properties for the group. Separate groups of empty string if you want
 * Full support CSS2/CSS2.1/CSS3/CSS4 ;) CSScomb ready for the advanced CSS-code
