@@ -28,4 +28,5 @@ For more info, online demo and tests see [http://csscomb.com/](csscomb.com)
 ## Authors
 
 CSScomb core: [miripiruni](mailto:mail@csscomb.ru)
+
 Sublime plugin: [i-akhmadullin](https://github.com/i-akhmadullin)
