@@ -20,6 +20,11 @@ text, not as a blind robot parsing CSS.
 
 For more info, online demo and tests see [http://csscomb.com/](csscomb.com)
 
+##Plugin usage
+
+Select code and press ```ctrl+shift+c```
+
+
 ## Issues & bugs
 
 [CSScomb tracker](https://github.com/miripiruni/CSSComb/issues)
