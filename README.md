@@ -21,10 +21,10 @@ text, not as a blind robot parsing CSS.
 For more info, online demo and tests see [http://csscomb.com/](csscomb.com)
 
 
-The Requirements
-------------
+## The Requirements
 
-* [PHP](http://windows.php.net/download/). Make sure that the path to the PHP is in an environment variable ([How to for Windows](https://github.com/miripiruni/CSScomb/tree/master/src/plugins/csscomb.notepad_plus_plus#required))
+CSScomb is written in pure PHP, without any external libraries or dependencies.
+See details at [wiki](https://github.com/miripiruni/CSScomb/wiki/Requirements).
 
 
 ##Plugin usage
