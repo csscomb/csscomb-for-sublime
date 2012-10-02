@@ -20,6 +20,13 @@ text, not as a blind robot parsing CSS.
 
 For more info, online demo and tests see [http://csscomb.com/](csscomb.com)
 
+
+The Requirements
+------------
+
+* [PHP](http://windows.php.net/download/) Make sure that the path to the PHP is in an environment variable ([How to for Windows](https://github.com/miripiruni/CSScomb/tree/master/src/plugins/csscomb.notepad_plus_plus#required))
+
+
 ##Plugin usage
 
 Select code and press ```ctrl+shift+c```
