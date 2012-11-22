@@ -31,7 +31,6 @@ class BaseSorter(sublime_plugin.TextCommand):
             threads.append(thread)
             thread.start()
 
-        selections.clear()
         self.handle_threads(edit, threads, selections, offset=0, i=0)
 
     def get_selections(self):
