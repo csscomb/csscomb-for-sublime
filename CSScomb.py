@@ -1,12 +1,22 @@
-import sublime, sublime_plugin
-from csscomb import BaseSort
+# coding: utf-8
+
+import sublime
+import sublime_plugin
+from csscomb import LocalSort
+
+
+def to_unicode_or_bust(obj, encoding='utf-8'):
+    if isinstance(obj, basestring):
+        if not isinstance(obj, unicode):
+            obj = unicode(obj, encoding)
+    return obj
+
 
 class BaseSorter(sublime_plugin.TextCommand):
     """Base Sorter"""
 
     def __init__(self, view):
         self.view = view
-        # self.settings = sublime.load_settings("Minifier.sublime-settings")
 
     def run(self, edit):
 
@@ -15,13 +25,12 @@ class BaseSorter(sublime_plugin.TextCommand):
         threads = []
         for sel in selections:
             selbody = self.view.substr(sel)
-
-            thread = BaseSort(sel,selbody)
+            selbody = selbody.encode('utf-8')
+            thread = LocalSort(sel, selbody)
 
             threads.append(thread)
             thread.start()
 
-        selections.clear()
         self.handle_threads(edit, threads, selections, offset=0, i=0)
 
     def get_selections(self):
@@ -40,7 +49,7 @@ class BaseSorter(sublime_plugin.TextCommand):
 
         return selections
 
-    def handle_threads(self, edit, threads, selections, offset = 0, i = 0):
+    def handle_threads(self, edit, threads, selections, offset=0, i=0):
 
         next_threads = []
         for thread in threads:
@@ -59,15 +68,10 @@ class BaseSorter(sublime_plugin.TextCommand):
         self.view.end_edit(edit)
         sublime.status_message('Successfully sorted')
 
-
     def handle_result(self, edit, thread, selections, offset):
-        sel = thread.sel
-        original = thread.original
-        # print original
         result = thread.result
-        # print result
 
-        if thread.error is True:
+        if thread.error:
             sublime.error_message(result)
             return
         elif result is None:
@@ -82,11 +86,8 @@ class CssSorter(BaseSorter):
     def handle_result(self, edit, thread, selections, offset):
         result = super(CssSorter, self).handle_result(edit, thread, selections, offset)
 
-        editgroup = self.view.begin_edit('csscomb')
-
         sel = thread.sel
-        result = thread.result
-        # if offset:
-            # sel = sublime.Region(thread.sel.begin() + offset, thread.sel.end() + offset)
+        result = to_unicode_or_bust(thread.result)
 
-        self.view.replace(edit, sel, result)
+        if not thread.error:
+            self.view.replace(edit, sel, result)
