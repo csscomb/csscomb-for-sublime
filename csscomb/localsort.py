@@ -18,7 +18,7 @@ class LocalSort(BaseSort):
 
     def check_php_on_path(self):
         try:
-            subprocess.call('php -v', shell=False, startupinfo=self.startupinfo)
+            subprocess.call(['php', '-v'], shell=False, startupinfo=self.startupinfo)
         except (OSError):
             self.error = True
             self.result = 'Unable find php.exe. Make sure it is available in your PATH.'
