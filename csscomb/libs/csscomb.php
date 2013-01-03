@@ -1,13 +1,17 @@
 <?php
 /**
  * CSScomb
- * @version: 2.11 (build 3ded73c-1208080145)
- * @author: Vyacheslav Oliyanchuk (miripiruni)
- * @web: http://csscomb.com/
+ *
+ * Tool for sorting CSS properties in specific order
+ *
+ * @version 2.12 (build e784736-1301040046)
+ * @author Vyacheslav Oliyanchuk (miripiruni) <mail@csscomb.com>
+ * @license MIT
+ * @web http://csscomb.com/
  */
- 
+
 error_reporting(E_ALL);
-    
+
 class csscomb{
 
     var $sort_order = Array(),
@@ -24,6 +28,8 @@ class csscomb{
         'expressions' => null,
         // если найдены data uri, то эта переменная станет массивом...
         'datauri' => null,
+        // если найдены интерполированные переменные, то эта переменная станет массивом
+        'interpolations' => null,
         // если найдены CSS-хаки мешающие парсить, то эта переменная станет массивом...
         'hacks' => null,
         // если найдены комментарии содержащие { или } мешающие парсить,
@@ -125,18 +131,18 @@ class csscomb{
         "-webkit-border-radius",
         "-moz-border-radius",
         "border-radius",
+        "-webkit-border-top-left-radius",
+        "-moz-border-radius-topleft",
+        "border-top-left-radius",
         "-webkit-border-top-right-radius",
-        "-moz-border-top-right-radius",
+        "-moz-border-radius-topright",
         "border-top-right-radius",
         "-webkit-border-bottom-right-radius",
-        "-moz-border-bottom-right-radius",
+        "-moz-border-radius-bottomright",
         "border-bottom-right-radius",
         "-webkit-border-bottom-left-radius",
-        "-moz-border-bottom-left-radius",
+        "-moz-border-radius-bottomleft",
         "border-bottom-left-radius",
-        "-webkit-border-top-left-radius",
-        "-moz-border-top-left-radius",
-        "border-top-left-radius",
         "-webkit-border-image",
         "-moz-border-image",
         "-o-border-image",
@@ -230,6 +236,8 @@ class csscomb{
         "-ms-writing-mode",
         "vertical-align",
         "text-align",
+        "-webkit-text-align-last",
+        "-moz-text-align-last",
         "-ms-text-align-last",
         "text-align-last",
         "text-decoration",
@@ -360,6 +368,7 @@ class csscomb{
         "-ms-animation-direction",
         "-o-animation-direction",
         "animation-direction",
+        "pointer-events",
         "unicode-bidi",
         "direction",
         "-webkit-columns",
@@ -559,7 +568,8 @@ class csscomb{
             "-o-animation-direction",
             "animation-direction",
             "text-align",
-            "text-align-last",
+            "-webkit-text-align-last",
+            "-moz-text-align-last",
             "-ms-text-align-last",
             "text-align-last",
             "vertical-align",
@@ -592,7 +602,8 @@ class csscomb{
             "tab-size",
             "-webkit-hyphens",
             "-moz-hyphens",
-            "hyphens"
+            "hyphens",
+            "pointer-events"
         ],
         [
             "opacity",
@@ -624,18 +635,18 @@ class csscomb{
             "-webkit-border-radius",
             "-moz-border-radius",
             "border-radius",
+            "-webkit-border-top-left-radius",
+            "-moz-border-radius-topleft",
+            "border-top-left-radius",
             "-webkit-border-top-right-radius",
-            "-moz-border-top-right-radius",
+            "-moz-border-radius-topright",
             "border-top-right-radius",
             "-webkit-border-bottom-right-radius",
-            "-moz-border-bottom-right-radius",
+            "-moz-border-radius-bottomright",
             "border-bottom-right-radius",
             "-webkit-border-bottom-left-radius",
-            "-moz-border-bottom-left-radius",
+            "-moz-border-radius-bottomleft",
             "border-bottom-left-radius",
-            "-webkit-border-top-left-radius",
-            "-moz-border-top-left-radius",
-            "border-top-left-radius",
             "-webkit-border-image",
             "-moz-border-image",
             "-o-border-image",
@@ -716,11 +727,25 @@ class csscomb{
 
     /**
      * @param string css
-     * @param boolean debug
-     * @param json custom_sort_order JSON expected
-     * @return string
+     * @param boolean debug, OPTIONAL
+     * @param json custom_sort_order JSON expected, OPTIONAL
+     * @return string|false
      *
      * @TODO: https://github.com/miripiruni/CSScomb/issues/21
+     *
+     * Example:
+     *
+     * <code>
+     *     require_once 'PATH_TO_CSScomb/csscomb.php';
+     *
+     *     $c = new csscomb();
+     *     $result_code = $c->csscomb(
+     *         'div {margin-top:0; color: red; display: inline;}',
+     *         false,
+     *         $MY_JSON_SORT_ORDER
+     *     );
+     * </code>
+     *
      */
     function csscomb($css = '', $debug = false, $custom_sort_order = null) {
         $this->output = $debug ? true : false;
@@ -872,18 +897,27 @@ class csscomb{
             endwhile;
         }
 
-        // 4. Закрываем сложности парсинга {}
+        // 4. Interpolated variables
+        preg_match_all('@(\#|\@){.*?}@ismx', $this->code['edited'], $this->code['interpolations']);
+        foreach ($this->code['interpolations'][0] as $key => $value) {
+            $pos = strpos($this->code['edited'], $value);
+            if ($pos !== false) {
+                $this->code['edited'] = substr_replace($this->code['edited'],"interpolation".$key.'__',$pos,strlen($value));
+            }    
+        }
+
+        // 5. Закрываем сложности парсинга {}
         $this->code['edited'] = str_replace('{}', '{ }', $this->code['edited']);
 
-        // 5. Закрываем сложности с отсутствующей последней ; перед }
+        // 6. Закрываем сложности с отсутствующей последней ; перед }
         $this->code['edited'] = preg_replace('@(.*?[^\s;\{\}\/\*])(\s*?})@', '$1;$2', $this->code['edited']);
         // Убираем ; у последнего инлайнового комментария
         // Инлайновый комментарий может идти только после фигурной скобки или ;
         $this->code['edited'] = preg_replace('@([;\{\}]+\s*?//.*?);(\s*?})@', '$1$2', $this->code['edited']);
         // Убираем ; у интерполированных переменных
-        $this->code['edited'] = preg_replace('@(#\{\$.*?)[;](\s*?\})@', '$1$2', $this->code['edited']);
+        $this->code['edited'] = preg_replace('/((#\{\$|\@\{).*?)[;](\s*?\})/', '$1$3', $this->code['edited']);
 
-        // 6. Комментарии
+        // 7. Комментарии
         if (preg_match_all('@
             (
             \s*
@@ -894,7 +928,7 @@ class csscomb{
             )
             @ismx', $this->code['edited'], $test)) {
 
-            // 6.1. Закомментировано одно или несколько свойств: повторяющийся паттерн *:*; \s*?
+            // 7.1. Закомментировано одно или несколько свойств: повторяющийся паттерн *:*; \s*?
             if (preg_match_all('@
                 (\s*)
                 /\*
@@ -943,7 +977,7 @@ class csscomb{
                 }
             }
 
-            // 6.2. Обрывки закомментированных деклараций: присутствует { или }
+            // 7.2. Обрывки закомментированных деклараций: присутствует { или }
             if (preg_match_all('@
                 \s*?
                 /\*
@@ -978,7 +1012,7 @@ class csscomb{
             }
         }
 
-        // 7. Entities
+        // 8. Entities
         if (preg_match_all('@
             \&
             \#?
@@ -1087,27 +1121,36 @@ class csscomb{
      *
      */
     function parse_child($value = '') {
+      $block_imports = array();
       // 1. Ищем «детей» (вложенные селекторы)
       preg_match_all('@
-        [^\};]*?[\s]*?\{((([^\{\}]+)|(?R))*)\}
+        [^};]*?
+        {
+            (
+                (
+                    ([^\{\}]+)|(?R)
+                )*
+            )
+        }
         @ismx', $value, $nested);
 
-      // Убираем из выборки интерполированные переменные
-      foreach ($nested[0] as $nested_key => $nested_value) {
-        if (strpos($nested_value, '#{$')) {
-          unset($nested[0][$nested_key]);
+      // TODO: возможно, вынести отдельной функцией, т.к. часто повторяется
+      foreach ($nested[0] as $key => &$nest) {
+        $value = str_replace($nest, '', $value);
+        if(strpos(trim($nest), '@include') === 0) {
+            $value = str_replace($nest, '', $value);
+            $old_nest = $nested[1][$key];
+            $new_nest = $this->parse_child($nested[1][$key]);
+            $nest = str_replace($old_nest, $new_nest, $nest);
+            $block_imports[] = $nest;
+            unset($nested[0][$key]);
+            unset($nested[1][$key]);
         }
       }
 
       // Сохраняем всех «детей» в строку для последующей замены
       // TODO: убрать, если без этого можно обойтись
       $nested_string = implode('', $nested[0]);
-
-      // Удаляем «детей» из общей строки
-      // TODO: возможно, вынести отдельной функцией, т.к. часто повторяется
-      foreach ($nested[0] as &$nest) {
-        $value = str_replace($nest, '', $value);
-      }
 
       // Рекурсия, ahoj!
       // Сортируем содержимое «детей»
@@ -1135,7 +1178,7 @@ class csscomb{
 
       // Включения, следующие сразу за {
       preg_match_all('@
-        ^\s*\@[^;]+?[;]
+        (^\s*\@[^;]+?[;])|(^\s*\.[^;:]+?[;])
         @isx', $value, $first_imports);
       foreach ($first_imports[0] as &$first_import) {
         $value = str_replace($first_import, '', $value);
@@ -1143,10 +1186,13 @@ class csscomb{
 
       // Все остальные
       preg_match_all('@
-        [;\{\}]+(\s*\@[^;]+?[;])
+        (?<=[;}])(\s*\@[^;]+?[;])|(?<=[;}])(\s*\.[^;:]+?[;])
         @ismx', $value, $imports);
       // Удаляем их из общей строки
       foreach ($imports[1] as &$import) {
+        $value = str_replace($import, '', $value);
+      }
+      foreach ($imports[2] as &$import) {
         $value = str_replace($import, '', $value);
       }
 
@@ -1168,7 +1214,7 @@ class csscomb{
       
       // 6. Склеиваем всё обратно в следующем порядке:
       //   переменные, включения, простые свойства, вложенные {}
-      $value = implode('', $vars[0]).implode('', $first_imports[0]).implode('', $imports[1]).implode('', $props).$nested_string.$value;
+      $value = implode('', $vars[0]).implode('', $first_imports[0]).implode('', $imports[1]).implode('', $imports[2]).implode('', $block_imports).implode('', $props).$nested_string.$value;
       return $value;
     }
 
@@ -1438,7 +1484,13 @@ class csscomb{
             }
         }
 
-        // 4. Удаляем искусственно созданные 'commented__'
+        // 4. Interpolated variables
+        preg_match_all('#interpolation(\d)__#ismx', $this->code['resorted'], $new_vars);
+        foreach ($new_vars[1] as $key => $value) {
+            $this->code['resorted'] = str_replace($new_vars[0][$key], $this->code['interpolations'][0][$key], $this->code['resorted']);    
+        }
+
+        // 5. Удаляем искусственно созданные 'commented__'
         while(strpos($this->code['resorted'], 'commented__') !== FALSE) {
             $this->code['resorted'] = preg_replace(
                 '#
@@ -1453,7 +1505,7 @@ class csscomb{
             );
         }
 
-        // 5. Удаляем искусственно созданные 'brace__'
+        // 6. Удаляем искусственно созданные 'brace__'
         if (is_array($this->code['braces'])) { // если были обнаружены и вырезаны хаки
             foreach ($this->code['braces'] as $key => $val) {
                 if (strpos($this->code['resorted'], 'brace__'.$key.'{') !== FALSE) {
