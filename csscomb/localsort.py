@@ -25,14 +25,16 @@ class LocalSort(BaseSort):
 
     def exec_request(self):
         if not self.error:
-            myprocess = subprocess.Popen(['php', csscomb_path, self.original], shell=False, stdout=subprocess.PIPE, startupinfo=self.startupinfo)
+            order = '["' + '","'.join(self.sortorder) + '"]'
+            print order
+            myprocess = subprocess.Popen(['php', csscomb_path, self.original, order], shell=False, stdout=subprocess.PIPE, startupinfo=self.startupinfo)
             (sout, serr) = myprocess.communicate()
             myprocess.wait()
 
-        if len(sout) > 0:
-            return sout
-        else:
-            return None
+            if len(sout) > 0:
+                return sout
+
+        return None
 
     def run(self):
         self.check_php_on_path()

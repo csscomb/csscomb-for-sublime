@@ -19,6 +19,11 @@ class BaseSorter(sublime_plugin.TextCommand):
         self.view = view
 
     def run(self, edit):
+        self.sortorder = False
+        self.order_settings = sublime.load_settings('CSScomb - Order.sublime-settings')
+        if self.order_settings:
+            self.sortorder = self.order_settings.get('sort_order')
+            sublime.status_message('Sorting with custom sort order...')
 
         selections = self.get_selections()
 
@@ -26,7 +31,7 @@ class BaseSorter(sublime_plugin.TextCommand):
         for sel in selections:
             selbody = self.view.substr(sel)
             selbody = selbody.encode('utf-8')
-            thread = LocalSort(sel, selbody)
+            thread = LocalSort(sel, selbody, self.sortorder)
 
             threads.append(thread)
             thread.start()
