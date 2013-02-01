@@ -27,6 +27,13 @@
                         "caption": "CSScomb",
                         "children":
                         [
+                            {
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/CSScomb/README.md"
+                                },
+                                "caption": "README"
+                            },
                             { "caption": "-" },
                             {
                                 "command": "open_file",
