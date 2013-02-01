@@ -37,12 +37,11 @@ select all rules for current css selector and sort them with csscomb.
 ## Custom sort order
 
 Plugin allows to use your own sort order.  
+  
 To customize it do following:  
-1. Open default sort order:  
-`Preferences` → `Package Settings` → `CSScomb` → `Sort Order – Default`  
+1. Open default sort order:  `Preferences` → `Package Settings` → `CSScomb` → `Sort Order – Default`  
 2. Copy whole file content.  
-3. Open user-defined sort order:  
-`Preferences` → `Package Settings` → `CSScomb` → `Sort Order – User`  
+3. Open user-defined sort order:  `Preferences` → `Package Settings` → `CSScomb` → `Sort Order – User`  
 4. Paste in this file.  
 5. Change order how you want.
 
