@@ -31,7 +31,7 @@ See details at [wiki](https://github.com/miripiruni/CSScomb/wiki/Requirements).
 
 Select code and press <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>  
   
-Tip: Try to combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>j</kbd>``` with ```<kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd>``` to quickly  
+Tip: Combine expand selection by indentation <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>j</kbd> with <kbd>ctrl</kbd>+<kbd>shift</kbd>+<kbd>c</kbd> to quickly  
 select all rules for current css selector and sort them with csscomb.
 
 ## Custom sort order
