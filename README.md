@@ -29,7 +29,10 @@ See details at [wiki](https://github.com/miripiruni/CSScomb/wiki/Requirements).
 
 ##Plugin usage
 
-Select code and press ```ctrl+shift+c```
+Select code and press ```ctrl+shift+c```  
+  
+Tip: Try to combine expand selection by indentation ```ctrl+shift+j``` with ```ctrl+shift+c``` to quickly  
+select all rules for current css selector and sort them with csscomb.
 
 
 ## Issues & bugs
