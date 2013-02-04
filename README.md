@@ -44,6 +44,7 @@ To customize it do following:
 3. Open user-defined sort order:  `Preferences` → `Package Settings` → `CSScomb` → `Sort Order – User`  
 4. Paste in this file.  
 5. Change order how you want.
+6. Set `custom_sort_order` value to `true`
 
 ## Issues & bugs
 

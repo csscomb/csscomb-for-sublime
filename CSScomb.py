@@ -20,8 +20,8 @@ class BaseSorter(sublime_plugin.TextCommand):
 
     def run(self, edit):
         self.sortorder = False
-        self.order_settings = sublime.load_settings('CSScomb - Order.sublime-settings')
-        if self.order_settings:
+        self.order_settings = sublime.load_settings('CSScomb.sublime-settings')
+        if self.order_settings.has('custom_sort_order') and self.order_settings.get('custom_sort_order') == True:
             self.sortorder = self.order_settings.get('sort_order')
             sublime.status_message('Sorting with custom sort order...')
 
