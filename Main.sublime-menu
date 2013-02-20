@@ -38,14 +38,14 @@
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/CSScomb/CSScomb - Order.sublime-settings"
+                                    "file": "${packages}/CSScomb/CSScomb.sublime-settings"
                                 },
                                 "caption": "Sort Order – Default"
                             },
                             {
                                 "command": "open_file",
                                 "args": {
-                                    "file": "${packages}/User/CSScomb - Order.sublime-settings"
+                                    "file": "${packages}/User/CSScomb.sublime-settings"
                                 },
                                 "caption": "Sort Order – User"
                             },
