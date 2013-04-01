@@ -4,6 +4,7 @@ import sys
 import sublime
 import sublime_plugin
 import subprocess
+import json
 from os import path, name
 
 __file__ = path.normpath(path.abspath(__file__))
@@ -36,9 +37,8 @@ class CssSorter(sublime_plugin.TextCommand):
 
         self.sortorder = False
         self.order_settings = sublime.load_settings('CSScomb.sublime-settings')
-        if self.order_settings.has('custom_sort_order') and self.order_settings.get('custom_sort_order') == True:
-            self.sortorder = self.order_settings.get('sort_order')
-            self.sortorder = '["' + '","'.join(self.sortorder) + '"]'
+        if self.order_settings.has('custom_sort_order') and self.order_settings.get('custom_sort_order') is True:
+            self.sortorder = json.dumps(self.order_settings.get('sort_order'))
             sublime.status_message('Sorting with custom sort order...')
         else:
             self.sortorder = ''
@@ -79,7 +79,7 @@ class CssSorter(sublime_plugin.TextCommand):
         # check if the user has any actual selections
         has_selections = False
         for region in selections:
-            if region.empty() == False:
+            if region.empty() is False:
                 has_selections = True
 
         # if not, add the entire file as a selection
