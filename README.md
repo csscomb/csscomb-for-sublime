@@ -1,4 +1,4 @@
-# CSScomb for Sublime Text 2
+# CSScomb for Sublime Text 2 & 3
 
 ## About
 
