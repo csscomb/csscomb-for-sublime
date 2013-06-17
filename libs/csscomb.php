@@ -4,7 +4,7 @@
  *
  * Tool for sorting CSS properties in specific order
  *
- * @version 2.12 (build e784736-1301040046)
+ * @version 2.13 (build bb516f2-1306162139)
  * @author Vyacheslav Oliyanchuk (miripiruni) <mail@csscomb.com>
  * @license MIT
  * @web http://csscomb.com/
@@ -213,8 +213,13 @@ class csscomb{
         "-ms-background-position-y",
         "background-position-x",
         "background-position-y",
+        "-webkit-background-clip",
+        "-moz-background-clip",
         "background-clip",
         "background-origin",
+        "-webkit-background-size",
+        "-moz-background-size",
+        "-o-background-size",
         "background-size",
         "background-repeat",
         "box-decoration-break",
@@ -687,8 +692,13 @@ class csscomb{
             "-ms-background-position-x",
             "background-position-y",
             "-ms-background-position-y",
+            "-webkit-background-clip",
+            "-moz-background-clip",
             "background-clip",
             "background-origin",
+            "-webkit-background-size",
+            "-moz-background-size",
+            "-o-background-size",
             "background-size",
             "box-decoration-break",
             "-webkit-box-shadow",
@@ -903,7 +913,7 @@ class csscomb{
             $pos = strpos($this->code['edited'], $value);
             if ($pos !== false) {
                 $this->code['edited'] = substr_replace($this->code['edited'],"interpolation".$key.'__',$pos,strlen($value));
-            }    
+            }
         }
 
         // 5. Закрываем сложности парсинга {}
@@ -1089,7 +1099,14 @@ class csscomb{
         if ($this->mode === 'properties') {
             $this->code['edited'] = "\n".$this->code['edited'];
             $this->code['resorted'] = $this->parse_child($this->code['edited']);
-            $this->code['resorted'] = substr($this->code['resorted'], 1);
+            // Remove first line if it's empty
+            if (strpos($this->code['resorted'], "\n") === 0) {
+                $this->code['resorted'] = substr($this->code['resorted'], 1);
+            }
+            // Remove all new lines if css initially didn't have any
+            if (substr_count($this->code['edited'], "\n") === 1) {
+                $this->code['resorted'] = str_replace("\n", '', $this->code['resorted']);
+            }
         }
     }
 
@@ -1180,15 +1197,15 @@ class csscomb{
       preg_match_all('@
         (^\s*\@[^;]+?[;])|(^\s*\.[^;:]+?[;])
         @isx', $value, $first_imports);
-      foreach ($first_imports[0] as &$first_import) {
-        $value = str_replace($first_import, '', $value);
-      }
 
       // Все остальные
       preg_match_all('@
         (?<=[;}])(\s*\@[^;]+?[;])|(?<=[;}])(\s*\.[^;:]+?[;])
         @ismx', $value, $imports);
       // Удаляем их из общей строки
+      foreach ($first_imports[0] as &$first_import) {
+        $value = str_replace($first_import, '', $value);
+      }
       foreach ($imports[1] as &$import) {
         $value = str_replace($import, '', $value);
       }
@@ -1204,14 +1221,14 @@ class csscomb{
         @ismx', $value, $properties);
       // Удаляем их из общей строки
       foreach ($properties[0] as &$property) {
-        $value = str_replace($property, '', $value);  
+        $value = str_replace($property, '', $value);
       }
       // Сортируем свойства
       $props = $properties[0];
       $props = $this->resort_properties($props);
 
       // 5. Если осталось ещё что-то, оставляем «как есть»
-      
+
       // 6. Склеиваем всё обратно в следующем порядке:
       //   переменные, включения, простые свойства, вложенные {}
       $value = implode('', $vars[0]).implode('', $first_imports[0]).implode('', $imports[1]).implode('', $imports[2]).implode('', $block_imports).implode('', $props).$nested_string.$value;
@@ -1432,7 +1449,11 @@ class csscomb{
             if (count($resorted) > 0) { // Если свойства разделены на группы
                 $resorted = $this->separate_property_group($resorted);
             }
-            if (count($undefined) > 0) {
+            if (
+                count($undefined) > 0 AND
+                // проверяем, что $undefined[0] не начинается с пустой строки
+                substr_count(substr($undefined[0], 0, 2), "\n\n") === 0
+            ) {
                 $undefined[0] = "\n".$undefined[0];
             }
         }
@@ -1500,7 +1521,7 @@ class csscomb{
                     .*?[^;]
                     ;)
                 #ismx',
-                '/* $1 */',
+                '/*$1*/',
                 $this->code['resorted']
             );
         }
