@@ -18,13 +18,13 @@ and everything that could be found in the real file. CSScomb reproduces these
 actions for you. This means that the parser "thinks" as a person editing the
 text, not as a blind robot parsing CSS.
 
-For more info, online demo and tests see [http://csscomb.com/](csscomb.com)
+For more info, online demo and tests see [http://csscomb.com](http://csscomb.com)
 
 
 ## The Requirements
 
 CSScomb is written in pure PHP, without any external libraries or dependencies.
-See details at [wiki](https://github.com/miripiruni/CSScomb/wiki/Requirements).
+See details at [wiki](https://github.com/csscomb/CSScomb/wiki/Requirements).
 
 
 ## Plugin usage
@@ -48,11 +48,11 @@ To customize it do following:
 
 ## Issues & bugs
 
-[CSScomb tracker](https://github.com/miripiruni/CSSComb/issues)
+[CSScomb tracker](https://github.com/csscomb/CSSComb/issues)
 
 
 ## Authors
 
-CSScomb core: [miripiruni](mailto:mail@csscomb.ru)
+CSScomb core: [miripiruni](https://github.com/miripiruni), [tonyganch](https://github.com/tonyganch)
 
 Sublime plugin: [i-akhmadullin](https://github.com/i-akhmadullin)
