@@ -93,5 +93,5 @@ class CssSorter(sublime_plugin.TextCommand):
         try:
             subprocess.call(['php', '-v'], shell=False, startupinfo=self.startupinfo)
         except (OSError):
-            sublime.error_message('Unable find php.exe. Make sure it is available in your PATH.')
+            sublime.error_message('Plugin unable to find php on computer.\nCSScomb needs PHP to function properly.\n\nPlease make sure you have installed PHP\nand it is available in your PATH:\n\nhttp://php.net/downloads.php')
             return
